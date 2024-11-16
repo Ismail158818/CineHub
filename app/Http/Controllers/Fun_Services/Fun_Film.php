@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Fun_Services;
 use Illuminate\Support\Facades\DB; // تأكد من إضافة هذا السطر
 use App\Models\Film;
+use App\Models\User;
 
 class Fun_Film
 {
@@ -13,14 +14,21 @@ class Fun_Film
             return false;
         }
     
+        $imagePath = 'default_image_path.jpg';
+        if (isset($validated['image'])) {
+            $imagePath = $validated['image']->store('media', 'public');
+        }
+            
         $add_film = Film::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
             'duration' => $validated['duration'],
-            'image' => $validated['image'],
             'link' => $validated['link'],
             'cast' => implode(',', $validated['cast']),
-            'rating' => $validated['rating']
+            'duration' => $validated['duration'],
+
+            'rating' => $validated['rating'],
+            'image' => $imagePath 
         ]);
     
         if (!$add_film) {
@@ -43,6 +51,7 @@ class Fun_Film
     
         return true;
     }
+    
     
 
     public function show_all_films_services()
@@ -85,4 +94,26 @@ class Fun_Film
         }
         return false;
     }
+    
+    public function add_to_favorites_services($validated)
+{
+    $user = User::find(auth()->id()); // استخدام المعرف من الجلسة
+    if (!$user) {
+        return ['status' => 'fail', 'message' => 'User not found'];
+    }
+
+    $film = Film::find($validated['film_id']);
+    if (!$film) {
+        return ['status' => 'fail', 'message' => 'Film not found'];
+    }
+
+    if ($user->films()->where('film_id', $film->id)->exists()) {
+        return ['status' => 'fail', 'message' => 'Film is already in favorites'];
+    }
+
+    $user->films()->attach($film->id);
+
+    return ['status' => 'success', 'message' => 'Film added to favorites successfully'];
+}
+
 }

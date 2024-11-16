@@ -52,4 +52,19 @@ class SeriesApiController extends Controller
 
         return response()->json($result, $result['status'] === 'success' ? 200 : 404);
     }
+
+    public function add_video(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'url' => 'required|url',
+            'duration' => 'required|integer',
+            'series_id' => 'required|integer|exists:series,id'
+        ]);
+
+        $add = new Fun_Series();
+        $result = $add->add_video_services($validated);
+
+        return response()->json($result, $result['status'] === 'success' ? 200 : 400);
+    }
 }

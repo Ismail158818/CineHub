@@ -15,4 +15,8 @@ class Type extends Model
     {
         return $this->belongsToMany(Film::class);
     }
+    public function seriess()
+    {
+        return $this->belongsToMany(Series::class);
+    }
 }

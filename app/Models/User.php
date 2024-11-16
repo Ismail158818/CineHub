@@ -24,9 +24,14 @@ class User extends Authenticatable
         'fcm_token'
     ];
 
-    public function cart()
+    
+    public function films()
     {
-        return $this->hasOne(Cart::class);
+        return $this->belongsToMany(Film::class);
+    }
+    public function series()
+    {
+        return $this->belongsToMany(Series::class);
     }
         /**
      * The attributes that should be hidden for serialization.

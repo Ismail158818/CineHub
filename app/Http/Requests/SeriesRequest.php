@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FilmRequest extends FormRequest
+class SeriesRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,16 +22,12 @@ class FilmRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'duration' => 'nullable|numeric',
-            'link' => 'nullable|string|max:255',
-            'cast' => 'nullable|array',
-            'rating' => 'nullable|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
+            'date' => ['required', 'date'],
+            'cast' => ['nullable', 'string'],
+            'description' => ['nullable', 'string'],
             'type_id' => 'nullable|array' 
-        ];
-          
-    }
 
+        ];
+    }
 }

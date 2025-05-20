@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\TypeApiController;
 use App\Http\Controllers\Api\FilmApiController;
@@ -40,8 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     
 });
-
 Route::controller(AuthApiController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('login', 'login');
-})->middleware('auth:sactum');
+});

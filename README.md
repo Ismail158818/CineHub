@@ -1,3 +1,40 @@
+# CineHub - Movies & Series Platform
+
+## Main Features
+
+### Movies Management
+- Add new movies
+- View all movies
+- Edit movie information
+- Delete movies
+- Search for movies
+- Add movies to favorites
+- View favorite movies list
+
+### Series Management
+- Add new series
+- View all series
+- Edit series information
+- Delete series
+- Search for series
+- Add series to favorites
+- View favorite series list
+- Add series episodes
+
+### Categories Management
+- Add new categories for movies and series
+
+### User System
+- User registration
+- User login
+- Secure authentication using Laravel Sanctum
+
+## Technologies Used
+- Laravel Framework
+- RESTful API
+- Secure Authentication System
+- MySQL Database
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

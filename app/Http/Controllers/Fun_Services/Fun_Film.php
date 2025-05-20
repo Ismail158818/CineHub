@@ -54,11 +54,31 @@ class Fun_Film
     
     
 
+
+
+
+
+
+
+
+    
     public function show_all_films_services()
     {
         $films = Film::all();
         return $films;
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function delete_film_services($request)
     {

@@ -22,12 +22,13 @@ class SeriesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255','unique:series'],
             'date' => ['required', 'date'],
             'cast' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
-            'type_id' => 'nullable|array' 
-
+            'rating' => ['required', 'integer'],
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'type_id' => ['nullable', 'array', 'exists:types,id']
         ];
     }
 }

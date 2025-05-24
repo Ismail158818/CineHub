@@ -9,7 +9,7 @@ class Series extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['name', 'release_date', 'cast', 'description', 'type'];
+    protected $fillable = ['name', 'date', 'cast', 'description','rating','image'];
 
     public function videos()
     {
@@ -17,6 +17,6 @@ class Series extends Model
     }
     public function types()
     {
-        return $this->belongsToMany(Video::class);
+        return $this->belongsToMany(Type::class);
     }
 }

@@ -18,9 +18,9 @@ class TypeApiController extends Controller
 
         $data = $create->add_type_services($validated);
         if ($data === 'true') {
-            return response()->json('success');
+            return response()->json(['status' => 'success', 'message' => 'Type added successfully']);
         }
-        return response()->json('this type exist already');
+        return response()->json(['status' => 'fail', 'message' => 'this type exist already']);
     }
 
 }

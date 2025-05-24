@@ -11,6 +11,7 @@ class Video extends Model
     
     protected $fillable = ['title', 'url', 'duration', 'series_id'];
 
+    
     public function series()
     {
         return $this->belongsTo(Series::class);

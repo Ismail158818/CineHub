@@ -15,10 +15,11 @@ class CreateSeriesTable extends Migration
         Schema::create('series', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->date('release_date');
+            $table->date('date');
             $table->string('cast');
             $table->text('description');
-            $table->string('type');
+            $table->integer('rating');
+            $table->string('image');
             $table->timestamps();
         });
     }

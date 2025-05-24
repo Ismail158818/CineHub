@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Fun_Services;
-use Illuminate\Support\Facades\DB; // تأكد من إضافة هذا السطر
+
+use Illuminate\Support\Facades\DB;
 use App\Models\Film;
+use App\Models\Series;
 use App\Models\User;
 
 class Fun_Film
@@ -11,92 +13,57 @@ class Fun_Film
     {
         $existed_film = Film::where('name', $validated['name'])->first();
         if ($existed_film) {
-            return false;
+            return ['status' => 'fail', 'message' => 'Film already exists'];
         }
-    
+
         $imagePath = 'default_image_path.jpg';
         if (isset($validated['image'])) {
             $imagePath = $validated['image']->store('media', 'public');
         }
-            
-        $add_film = Film::create([
+
+        $film = Film::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
             'duration' => $validated['duration'],
             'link' => $validated['link'],
             'cast' => implode(',', $validated['cast']),
-            'duration' => $validated['duration'],
-
             'rating' => $validated['rating'],
-            'image' => $imagePath 
+            'image' => $imagePath,
         ]);
-    
-        if (!$add_film) {
-            return false;
+
+        if (!$film) {
+            return ['status' => 'fail', 'message' => 'Film not added'];
         }
-    
-        $all_attached = true;
+
         foreach ($validated['type_id'] as $type_id) {
-            $add_film->types()->attach($type_id);
-            if (!$add_film->types()->find($type_id)) {
-                $all_attached = false;
-                break;
-            }
+            $film->types()->attach($type_id);
         }
-    
-        if (!$all_attached) {
-            $add_film->delete();
-            return false;
-        }
-    
-        return true;
+
+        return ['status' => 'success', 'message' => 'Film added successfully'];
     }
-    
-    
 
-
-
-
-
-
-
-
-    
     public function show_all_films_services()
     {
         $films = Film::all();
-        return $films;
+        return ['status' => 'success', 'films' => $films];
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     public function delete_film_services($request)
     {
-        $film = Film::where('name', $request->name)->first();
-
-        if ($film) {
-            $film->delete();
-            return true;
+        $film = Film::find($request['id']);
+        if (!$film) {
+            return ['status' => 'fail', 'message' => 'Film not found'];
         }
-        return false;
+
+        $film->delete();
+        return ['status' => 'success', 'message' => 'Film deleted successfully'];
     }
 
     public function edit_film_services($validated)
     {
         $film = Film::find($validated['id']);
-
         if (!$film) {
-            return false;
+            return ['status' => 'fail', 'message' => 'Film not found'];
         }
 
         $status = $film->update(array_filter([
@@ -105,35 +72,70 @@ class Fun_Film
             'duration' => $validated['duration'] ?? $film->duration,
             'image' => $validated['image'] ?? $film->image,
             'link' => $validated['link'] ?? $film->link,
-            'cast' => $validated['cast'] ?? $film->cast,
+            'cast' => isset($validated['cast']) ? implode(',', $validated['cast']) : $film->cast,
             'rating' => $validated['rating'] ?? $film->rating
         ]));
 
-        if ($status) {
-            return true;
-        }
-        return false;
+        return $status
+            ? ['status' => 'success', 'message' => 'Film updated successfully']
+            : ['status' => 'fail', 'message' => 'Failed to update film'];
     }
-    
+
     public function add_to_favorites_services($validated)
+    {
+        $user = User::find(auth()->id());
+        $film = Film::find($validated['film_id']);
+
+        if ($user->films()->where('film_id', $film->id)->exists()) {
+            return ['status' => 'fail', 'message' => 'Film already in favorites'];
+        }
+
+        $user->films()->attach($film->id);
+
+        return ['status' => 'success', 'message' => 'Film added to favorites'];
+    }
+
+    public function show_favorites_films_services()
+    {
+        $user = User::find(auth()->id());
+        if (!$user) {
+            return ['status' => 'fail', 'message' => 'User not found'];
+        }
+
+        return ['status' => 'success', 'films' => $user->films];
+    }
+    public function search_services($request)
 {
-    $user = User::find(auth()->id()); // استخدام المعرف من الجلسة
-    if (!$user) {
-        return ['status' => 'fail', 'message' => 'User not found'];
+       $serch_films = Film::where('name', 'like', '%' . $request['search'] . '%')
+        ->get()
+        ->map(function ($film) {
+            return [
+                'id' => $film->id,
+                'name' => $film->name,
+                'image' => $film->image, 
+                'rating' => $film->rating,      
+                'type' => 'film',
+            ];
+        });
+
+    // البحث في المسلسلات
+    $serch_serios = Series::where('name', 'like', '%' . $request['search'] . '%')
+        ->get()
+        ->map(function ($series) {
+            return [
+                'id' => $series->id,
+                'name' => $series->name,
+                'image' => $series->image,
+                'rating' => $series->rating,   
+                'type' => 'series',
+            ];
+        });
+
+    $all_search = $serch_films->concat($serch_serios)->values(); // ✅ concat يحل مشكلة getKey()
+    if ($all_search->isEmpty()) {
+        return ['status' => 'fail', 'message' => 'No results found'];
     }
-
-    $film = Film::find($validated['film_id']);
-    if (!$film) {
-        return ['status' => 'fail', 'message' => 'Film not found'];
-    }
-
-    if ($user->films()->where('film_id', $film->id)->exists()) {
-        return ['status' => 'fail', 'message' => 'Film is already in favorites'];
-    }
-
-    $user->films()->attach($film->id);
-
-    return ['status' => 'success', 'message' => 'Film added to favorites successfully'];
+    return ['status' => 'success', 'The results' => $all_search];
 }
 
 }
